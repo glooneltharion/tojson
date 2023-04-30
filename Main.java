@@ -1,4 +1,3 @@
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,16 +13,16 @@ import java.util.Map;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        File inputFile = new File("src/input.html");
-        Map<String, String> result = convert(inputFile);
+        File folder = new File("src");
+        File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".html"));
 
-        String outputFilePath = "sk.json";
-        writeToJsonFile(result, outputFilePath);
-
+        for (File file : files) {
+            convert(file);
+        }
     }
 
 
-    public static Map<String, String> convert(File input) throws IOException {
+    public static void convert(File input) throws IOException {
         String html = new String(Files.readAllBytes(input.toPath()));
         Document doc = Jsoup.parse(html);
 
@@ -34,7 +33,11 @@ public class Main {
             processNode(node, result, counter);
         }
 
-        return result;
+
+        String outputFilePath = "sk-" + input.getPath().split("\\.")[0].replace("src\\" , "")+ ".json";
+        System.out.println(outputFilePath);
+
+        writeToJsonFile(result, outputFilePath);
     }
 
     private static int processNode(Node node, Map<String, String> result, int counter) {
